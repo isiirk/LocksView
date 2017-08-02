@@ -2,7 +2,7 @@ object FMain: TFMain
   Left = 0
   Top = 0
   Caption = 'MSSQL Locks View'
-  ClientHeight = 525
+  ClientHeight = 445
   ClientWidth = 753
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -190,7 +190,7 @@ object FMain: TFMain
   TextHeight = 13
   object StatusBar: TStatusBar
     Left = 0
-    Top = 506
+    Top = 426
     Width = 753
     Height = 19
     Panels = <
@@ -201,21 +201,14 @@ object FMain: TFMain
         Alignment = taCenter
         Width = 50
       end>
-    ExplicitLeft = 496
-    ExplicitTop = 288
-    ExplicitWidth = 0
   end
-  object PageControl1: TPageControl
+  object PageControl: TPageControl
     Left = 0
     Top = 37
     Width = 753
-    Height = 469
+    Height = 389
     Align = alClient
     TabOrder = 1
-    ExplicitLeft = 40
-    ExplicitTop = 40
-    ExplicitWidth = 289
-    ExplicitHeight = 193
   end
   object ToolBar1: TToolBar
     Left = 0
@@ -247,9 +240,31 @@ object FMain: TFMain
       Action = AExit
     end
   end
-  object FDConnection: TFDConnection
-    Left = 688
-    Top = 120
+  object Memo: TMemo
+    Left = 56
+    Top = 184
+    Width = 441
+    Height = 209
+    Lines.Strings = (
+      'SELECT DB_NAME(pr1.dbid) AS '#39'DB'#39
+      '      ,pr1.spid AS '#39'ID '#1078#1077#1088#1090#1074#1099#39
+      '      ,RTRIM(pr1.loginame) AS '#39'Login '#1078#1077#1088#1090#1074#1099#39
+      '      ,pr2.spid AS '#39'ID '#1074#1080#1085#1086#1074#1085#1080#1082#1072#39
+      '      ,RTRIM(pr2.loginame) AS '#39'Login '#1074#1080#1085#1086#1074#1085#1080#1082#1072#39
+      '      ,pr1.program_name AS '#39#1055#1088#1086#1075#1088#1072#1084#1084#1072' '#1078#1077#1088#1090#1074#1099#39
+      '      ,pr2.program_name AS '#39#1055#1088#1086#1075#1088#1072#1084#1084#1072' '#1074#1080#1085#1086#1074#1085#1080#1082#1072#39
+      '--      ,txt.[text] AS '#39#1047#1072#1087#1088#1086#1089' '#1074#1080#1085#1086#1074#1085#1080#1082#1072#39
+      'FROM   MASTER.dbo.sysprocesses pr1(NOLOCK)'
+      '       JOIN MASTER.dbo.sysprocesses pr2(NOLOCK)'
+      '            ON  (pr2.spid = pr1.blocked)'
+      
+        '       OUTER APPLY sys.[dm_exec_sql_text](pr2.[sql_handle]) AS t' +
+        'xt'
+      'WHERE  pr1.blocked <> 0'
+      '')
+    ReadOnly = True
+    TabOrder = 3
+    Visible = False
   end
   object ClockTimer: TTimer
     OnTimer = ClockTimerTimer
@@ -452,6 +467,8 @@ object FMain: TFMain
       00000000000000000000000000000000000000000000}
     PopupMenu = PopupMenu
     Visible = True
+    OnBalloonClick = TrayIconBalloonClick
+    OnDblClick = TrayIconDblClick
     Left = 688
     Top = 232
   end
@@ -476,6 +493,7 @@ object FMain: TFMain
     object ActionSetup: TAction
       Caption = #1053#1072#1089#1090#1088#1086#1081#1082#1080
       ImageIndex = 1
+      OnExecute = ActionSetupExecute
     end
   end
   object ActionImageList: TImageList
@@ -484,7 +502,7 @@ object FMain: TFMain
     Left = 688
     Top = 360
     Bitmap = {
-      494C010102000800380020002000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010102000800480020002000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000800000002000000001002000000000000040
       000000000000000000000000000000000000FFFFFF01FFFFFF01FFFFFF01FFFF
       FF01FFFFFF01FFFFFF01FFFFFF01FFFFFF01FFFFFF01FFFFFF01F7EFE721E9D1
@@ -1040,5 +1058,22 @@ object FMain: TFMain
     object N3: TMenuItem
       Action = AExit
     end
+  end
+  object TimerHide: TTimer
+    Interval = 100
+    OnTimer = TimerHideTimer
+    Left = 688
+    Top = 416
+  end
+  object TimerCheck: TTimer
+    Enabled = False
+    Interval = 3000
+    OnTimer = TimerCheckTimer
+    Left = 688
+    Top = 128
+  end
+  object FDConnection1: TFDConnection
+    Left = 528
+    Top = 104
   end
 end

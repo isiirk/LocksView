@@ -1,0 +1,361 @@
+unit main;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, FireDAC.Stan.Intf, FireDAC.Stan.Option,
+  FireDAC.Stan.Error, FireDAC.UI.Intf, FireDAC.Phys.Intf, FireDAC.Stan.Def,
+  FireDAC.Stan.Pool, FireDAC.Stan.Async, FireDAC.Phys, FireDAC.VCLUI.Wait,
+  Data.DB, FireDAC.Comp.Client, Vcl.ComCtrls, Vcl.ExtCtrls,
+  IniFiles, System.Actions, Vcl.ActnList, Vcl.ToolWin,
+  Vcl.PlatformDefaultStyleActnCtrls, Vcl.ActnMan, Vcl.Menus, System.ImageList,
+  Vcl.ImgList, FireDAC.Stan.Param, FireDAC.DatS, FireDAC.DApt.Intf,
+  FireDAC.DApt, Vcl.Grids, Vcl.DBGrids, FireDAC.Comp.DataSet, Vcl.StdCtrls,
+  FireDAC.Phys.MSSQL, FireDAC.Phys.MSSQLDef;
+
+type
+  TFMain = class(TForm)
+    StatusBar: TStatusBar;
+    ClockTimer: TTimer;
+    PageControl: TPageControl;
+    MainMenu: TMainMenu;
+    TrayIcon: TTrayIcon;
+    ActionManager: TActionManager;
+    ToolBar1: TToolBar;
+    AExit: TAction;
+    ToolButton1: TToolButton;
+    ActionImageList: TImageList;
+    ToolButton2: TToolButton;
+    N1: TMenuItem;
+    N2: TMenuItem;
+    PopupMenu: TPopupMenu;
+    N3: TMenuItem;
+    ActionShow: TAction;
+    ActionHide: TAction;
+    N4: TMenuItem;
+    N5: TMenuItem;
+    N6: TMenuItem;
+    N7: TMenuItem;
+    N8: TMenuItem;
+    ActionSetup: TAction;
+    N9: TMenuItem;
+    N10: TMenuItem;
+    N11: TMenuItem;
+    N12: TMenuItem;
+    ToolButton3: TToolButton;
+    TimerHide: TTimer;
+    Memo: TMemo;
+    TimerCheck: TTimer;
+    procedure FormCreate(Sender: TObject);
+    procedure FormResize(Sender: TObject);
+    procedure ClockTimerTimer(Sender: TObject);
+    procedure AExitExecute(Sender: TObject);
+    procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
+    procedure ActionShowExecute(Sender: TObject);
+    procedure ActionHideExecute(Sender: TObject);
+    procedure ActionSetupExecute(Sender: TObject);
+    procedure TrayIconDblClick(Sender: TObject);
+    procedure TimerHideTimer(Sender: TObject);
+    procedure TimerCheckTimer(Sender: TObject);
+    procedure TrayIconBalloonClick(Sender: TObject);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+    function MyGetFileVersion(const FileName: string): string;
+  end;
+
+var
+  FMain: TFMain;
+  MinimizeOnRun: boolean;
+  Freq: integer;
+  ShowErrorCount: integer;
+
+  FDConn: array of TFDConnection;
+  FDQuery: array of TFDQuery;
+  DataSource: array of TDataSource;
+  DBGrid: array of TDBGrid;
+  TabSheet: array of TTabSheet;
+  TestError: array of integer;
+
+
+implementation
+
+{$R *.dfm}
+
+uses setup;
+
+
+procedure TFMain.ActionHideExecute(Sender: TObject);
+begin
+  FMain.Visible:=False;
+  ActionShow.Enabled:=true;
+  ActionHide.Enabled:=false;
+end;
+
+procedure TFMain.ActionSetupExecute(Sender: TObject);
+begin
+  FSetup.ShowModal();
+end;
+
+procedure TFMain.ActionShowExecute(Sender: TObject);
+begin
+  FMain.Visible:=True;
+  ActionShow.Enabled:=false;
+  ActionHide.Enabled:=true;
+end;
+
+procedure TFMain.AExitExecute(Sender: TObject);
+begin
+  Application.Terminate;
+end;
+
+procedure TFMain.ClockTimerTimer(Sender: TObject);
+begin
+  StatusBar.Panels[1].Text:=TimeToStr(Time);
+end;
+
+procedure TFMain.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
+begin
+  ActionHide.Execute;
+  CanClose:=false;
+end;
+
+procedure TFMain.FormCreate(Sender: TObject);
+var
+  i: integer;
+  IniFile: TIniFile;
+  PathINI: string;
+begin
+  ActionHide.Enabled:=false;
+  ActionShow.Enabled:=false;
+
+  Application.Title:='MSSQl Locks View ver.'+MyGetFileVersion(Application.ExeName)  ;
+  FMain.Caption:=Application.Title;
+  TrayIcon.Hint:=Application.Title;
+  ClockTimerTimer(Sender);
+  PathINI:=ExtractFilePath(Application.ExeName)+ChangeFileExt(ExtractFilename(Application.ExeName),'.ini');
+  IniFile := TiniFile.Create(PathINI);
+  MinimizeOnRun := IniFile.ReadBool('Main', 'MinimizeOnRun', false);
+  Freq := IniFile.ReadInteger('Main', 'Freq', 3);
+  ShowErrorCount := IniFile.ReadInteger('Main', 'ShowErrorCount', 3);
+  TimerCheck.Interval:=Freq*1000;
+
+  i:=0;
+  while IniFile.SectionExists('Server'+IntToStr(i)) do
+    begin
+    SetLength(FDConn,i+1);
+    SetLength(FDQuery,i+1);
+    SetLength(DataSource,i+1);
+    SetLength(DBGrid,i+1);
+    SetLength(TabSheet,i+1);
+    SetLength(TestError,i+1);
+
+    FDConn[i]:=TFDConnection.Create(self);
+    FDConn[i].LoginPrompt:=false;
+    FDConn[i].DriverName:='MSSQL';
+    FDConn[i].Params.Add('Server='+IniFile.ReadString('Server'+IntToStr(i),'adress',''));
+    FDConn[i].Params.Database:='master';
+    FDConn[i].Params.UserName:=IniFile.ReadString('Server'+IntToStr(i),'user','');
+    FDConn[i].Params.Password:=IniFile.ReadString('Server'+IntToStr(i),'password','');
+    FDConn[i].ResourceOptions.AutoConnect:=false;
+
+
+    try
+      FDConn[i].Connected:=true;
+      FDQuery[i]:=TFDQuery.Create(self);
+      FDQuery[i].Connection:=FDCOnn[i];
+      FDQuery[i].SQL:=Memo.Lines;
+
+      if FDConn[i].Connected then
+        FDQuery[i].Active:=True;
+
+      DataSource[i]:=TDataSource.Create(self);
+      DataSource[i].DataSet:=FDQuery[i];
+
+      TabSheet[i]:=TTabSheet.Create(self);
+      TabSheet[i].PageControl:=PageControl;
+      TabSheet[i].Caption:=IniFile.ReadString('Server'+IntToStr(i),'adress','');
+
+      DBGrid[i]:=TDBGrid.Create(self);
+      DBGrid[i].Parent:=TabSheet[i];
+      DBGrid[i].Align:=alClient;
+      DBGrid[i].DataSource:=DataSource[i];
+
+      TestError[i]:=0;
+    except
+
+    end;
+
+    Inc(i);
+
+    end;
+
+  FormResize(Sender);
+  IniFile.Free;
+  TimerCheck.Enabled:=true;
+
+  if MinimizeOnRun then
+    begin
+      ActionHide.Enabled:=false;
+      ActionShow.Enabled:=true;
+    end
+    else
+    begin
+      ActionHide.Enabled:=true;
+      ActionShow.Enabled:=false;
+    end;
+
+
+end;
+
+procedure TFMain.FormResize(Sender: TObject);
+var
+  x: integer;
+  i: integer;
+begin
+  StatusBar.Panels[0].Width := FMain.Width-100;
+
+  for i := 0 to Length(DBGrid)-1 do
+    begin
+        if FDConn[i].Connected then
+          for x := 0 to 6 do
+            begin
+              DBGrid[i].Columns[x].Width:=(FMain.Width div 7)-10;
+           end;
+    end;
+
+
+
+end;
+
+
+function TFMain.MyGetFileVersion(const FileName: string): string;
+type
+  PDWORD = ^DWORD;
+  PLangAndCodePage = ^TLangAndCodePage;
+  TLangAndCodePage = packed record
+    wLanguage: WORD;
+    wCodePage: WORD;
+  end;
+  PLangAndCodePageArray = ^TLangAndCodePageArray;
+  TLangAndCodePageArray = array[0..0] of TLangAndCodePage;
+var
+  loc_InfoBufSize: DWORD;
+  loc_InfoBuf: PChar;
+  loc_VerBufSize: DWORD;
+  loc_VerBuf: PChar;
+  cbTranslate: DWORD;
+  lpTranslate: PDWORD;
+  i: DWORD;
+begin
+  Result := '';
+  if (Length(FileName) = 0) or (not Fileexists(FileName)) then
+    Exit;
+  loc_InfoBufSize := GetFileVersionInfoSize(PChar(FileName), loc_InfoBufSize);
+  if loc_InfoBufSize > 0 then
+  begin
+    loc_VerBuf := nil;
+    loc_InfoBuf := AllocMem(loc_InfoBufSize);
+    try
+      if not GetFileVersionInfo(PChar(FileName), 0, loc_InfoBufSize, loc_InfoBuf)
+        then
+        exit;
+      if not VerQueryValue(loc_InfoBuf, '\\VarFileInfo\\Translation',
+        Pointer(lpTranslate), DWORD(cbTranslate)) then
+        exit;
+      for i := 0 to (cbTranslate div SizeOf(TLangAndCodePage)) - 1 do
+      begin
+        if VerQueryValue(
+          loc_InfoBuf,
+          PChar(Format(
+          'StringFileInfo\0%x0%x\FileVersion', [
+          PLangAndCodePageArray(lpTranslate)[i].wLanguage,
+            PLangAndCodePageArray(lpTranslate)[i].wCodePage])),
+            Pointer(loc_VerBuf),
+          DWORD(loc_VerBufSize)
+          ) then
+        begin
+          Result := loc_VerBuf;
+          Break;
+        end;
+      end;
+    finally
+      FreeMem(loc_InfoBuf, loc_InfoBufSize);
+    end;
+  end;
+end;
+
+
+
+procedure TFMain.TimerCheckTimer(Sender: TObject);
+var
+  i: integer;
+  msg: string;
+begin
+  msg:='';
+  for i := 0 to Length(DBGrid)-1 do
+    begin
+      if FDConn[i].Connected then
+      begin
+      DBGrid[i].DataSource.DataSet.Refresh;
+      if DBGrid[i].DataSource.DataSet.RecordCount>0 then
+        begin
+          Inc(TestError[i]);
+          if TestError[i]=ShowErrorCount then
+            begin
+              msg:=msg+'Locks in server: '+ TabSheet[i].Caption + chr(13);
+            end;
+
+        end
+      else
+        begin
+          TestError[i]:=0;
+        end;
+      end;
+    end;
+
+    if msg<>'' then
+      begin
+        TrayIcon.BalloonHint:=msg;
+        TrayIcon.ShowBalloonHint;
+      end;
+
+
+end;
+
+procedure TFMain.TimerHideTimer(Sender: TObject);
+begin
+  if MinimizeOnRun then
+    ActionHide.Execute;
+  TimerHide.Enabled:=false;
+end;
+
+procedure TFMain.TrayIconBalloonClick(Sender: TObject);
+var
+  i: integer;
+begin
+  ActionShowExecute(self);
+  i:=0;
+  for i:=0 to Length(FDQuery)-1 do
+    begin
+      if FDQuery[i].RecordCount>0 then
+        begin
+          PageControl.ActivePage:=TabSheet[i];
+          break;
+        end;
+    end;
+
+
+end;
+
+procedure TFMain.TrayIconDblClick(Sender: TObject);
+begin
+  if Fmain.Visible then
+    ActionHide.Execute
+    else
+    ActionShow.Execute;
+end;
+
+end.
