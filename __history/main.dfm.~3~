@@ -1,0 +1,44 @@
+object FMain: TFMain
+  Left = 0
+  Top = 0
+  Caption = 'FMain'
+  ClientHeight = 299
+  ClientWidth = 635
+  Color = clBtnFace
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -11
+  Font.Name = 'Tahoma'
+  Font.Style = []
+  OldCreateOrder = False
+  OnCreate = FormCreate
+  OnResize = FormResize
+  PixelsPerInch = 96
+  TextHeight = 13
+  object StatusBar: TStatusBar
+    Left = 0
+    Top = 280
+    Width = 635
+    Height = 19
+    Panels = <
+      item
+        Width = 500
+      end
+      item
+        Alignment = taCenter
+        Width = 50
+      end>
+    ExplicitLeft = 496
+    ExplicitTop = 288
+    ExplicitWidth = 0
+  end
+  object FDConnection: TFDConnection
+    Left = 544
+    Top = 24
+  end
+  object ClockTimer: TTimer
+    OnTimer = ClockTimerTimer
+    Left = 544
+    Top = 80
+  end
+end

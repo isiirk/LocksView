@@ -1,0 +1,69 @@
+unit setup;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ComCtrls, Vcl.ExtCtrls, IniFiles,
+  Vcl.Samples.Spin;
+
+type
+  TFSetup = class(TForm)
+    Panel1: TPanel;
+    Panel2: TPanel;
+    PageControl1: TPageControl;
+    TabSheet1: TTabSheet;
+    TabSheet2: TTabSheet;
+    Button1: TButton;
+    Button2: TButton;
+    EMinimizeOnRun: TCheckBox;
+    EFreq: TSpinEdit;
+    Label1: TLabel;
+    Label2: TLabel;
+    EShowCountError: TSpinEdit;
+    procedure Button2Click(Sender: TObject);
+    procedure Button1Click(Sender: TObject);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  FSetup: TFSetup;
+
+implementation
+
+{$R *.dfm}
+
+uses main;
+
+procedure TFSetup.Button1Click(Sender: TObject);
+var
+  IniFile: TIniFile;
+  PathINI: string;
+begin
+
+  MinimizeOnRun:=EMinimizeOnRun.Checked;
+  Freq:=EFreq.Value;
+  ShowErrorCount:=EShowCountError.Value;
+  FMain.TimerCheck.Interval:=Freq*1000;
+
+
+  PathINI:=ExtractFilePath(Application.ExeName)+ChangeFileExt(ExtractFilename(Application.ExeName),'.ini');
+  IniFile := TiniFile.Create(PathINI);
+
+  IniFile.WriteBool('Main', 'MinimizeOnRun', MinimizeOnRun);
+  IniFile.WriteInteger('Main', 'Freq', Freq);
+  IniFile.WriteInteger('Main', 'ShowErrorCount', ShowErrorCount);
+
+
+  FSetup.Close;
+end;
+
+procedure TFSetup.Button2Click(Sender: TObject);
+begin
+  FSetup.Close;
+end;
+
+end.
