@@ -2,11 +2,11 @@
 <BorlandProject>
 	<Transactions>
     <Transaction>1899.12.30 00:00:00.000.155,=C:\Users\i.sudos\Documents\Embarcadero\Studio\Projects\LocksView\Unit1.pas</Transaction>
-    <Transaction>1899.12.30 00:00:00.000.952,C:\Users\i.sudos\Documents\Embarcadero\Studio\Projects\LocksView\LocksMsSQLView.dproj=C:\Users\i.sudos\Documents\Embarcadero\Studio\Projects\Project1.dproj</Transaction>
-    <Transaction>1899.12.30 00:00:00.000.698,C:\Users\i.sudos\Documents\Embarcadero\Studio\Projects\LocksView\main.pas=C:\Users\i.sudos\Documents\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.075,C:\Users\i.sudos\Documents\Embarcadero\Studio\Projects\LocksView\Unit1.pas=C:\Users\i.sudos\Documents\Embarcadero\Studio\Projects\LocksView\setup.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.075,C:\Users\i.sudos\Documents\Embarcadero\Studio\Projects\LocksView\Unit1.dfm=C:\Users\i.sudos\Documents\Embarcadero\Studio\Projects\LocksView\setup.dfm</Transaction>
     <Transaction>1899.12.30 00:00:00.000.655,=C:\Users\i.sudos\Documents\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
-    <Transaction>1899.12.30 00:00:00.000.075,C:\Users\i.sudos\Documents\Embarcadero\Studio\Projects\LocksView\setup.pas=C:\Users\i.sudos\Documents\Embarcadero\Studio\Projects\LocksView\Unit1.pas</Transaction>
-    <Transaction>1899.12.30 00:00:00.000.698,C:\Users\i.sudos\Documents\Embarcadero\Studio\Projects\LocksView\main.dfm=C:\Users\i.sudos\Documents\Embarcadero\Studio\Projects\Unit1.dfm</Transaction>
-    <Transaction>1899.12.30 00:00:00.000.075,C:\Users\i.sudos\Documents\Embarcadero\Studio\Projects\LocksView\setup.dfm=C:\Users\i.sudos\Documents\Embarcadero\Studio\Projects\LocksView\Unit1.dfm</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.952,C:\Users\i.sudos\Documents\Embarcadero\Studio\Projects\Project1.dproj=C:\Users\i.sudos\Documents\Embarcadero\Studio\Projects\LocksView\LocksMsSQLView.dproj</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.698,C:\Users\i.sudos\Documents\Embarcadero\Studio\Projects\Unit1.dfm=C:\Users\i.sudos\Documents\Embarcadero\Studio\Projects\LocksView\main.dfm</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.698,C:\Users\i.sudos\Documents\Embarcadero\Studio\Projects\Unit1.pas=C:\Users\i.sudos\Documents\Embarcadero\Studio\Projects\LocksView\main.pas</Transaction>
   </Transactions>
 </BorlandProject>
