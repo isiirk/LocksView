@@ -128,6 +128,9 @@ var
   IniFile: TIniFile;
   PathINI: string;
 begin
+  ActionHide.Enabled:=false;
+  ActionShow.Enabled:=false;
+
   Application.Title:='MSSQl Locks View ver.'+MyGetFileVersion(Application.ExeName)  ;
   FMain.Caption:=Application.Title;
   TrayIcon.Hint:=Application.Title;
@@ -150,19 +153,23 @@ begin
     SetLength(TestError,i+1);
 
     FDConn[i]:=TFDConnection.Create(self);
-    FDCOnn[i].LoginPrompt:=false;
-    FDCOnn[i].DriverName:='MSSQL';
-    FDCOnn[i].Params.Add('Server='+IniFile.ReadString('Server'+IntToStr(i),'adress',''));
-    FDCOnn[i].Params.Database:='master';
-    FDCOnn[i].Params.UserName:=IniFile.ReadString('Server'+IntToStr(i),'user','');
-    FDCOnn[i].Params.Password:=IniFile.ReadString('Server'+IntToStr(i),'password','');
-    try
-      FDCOnn[i].Connected:=true;
+    FDConn[i].LoginPrompt:=false;
+    FDConn[i].DriverName:='MSSQL';
+    FDConn[i].Params.Add('Server='+IniFile.ReadString('Server'+IntToStr(i),'adress',''));
+    FDConn[i].Params.Database:='master';
+    FDConn[i].Params.UserName:=IniFile.ReadString('Server'+IntToStr(i),'user','');
+    FDConn[i].Params.Password:=IniFile.ReadString('Server'+IntToStr(i),'password','');
+    FDConn[i].ResourceOptions.AutoConnect:=false;
 
+
+    try
+      FDConn[i].Connected:=true;
       FDQuery[i]:=TFDQuery.Create(self);
       FDQuery[i].Connection:=FDCOnn[i];
       FDQuery[i].SQL:=Memo.Lines;
-      FDQuery[i].Active:=True;
+
+      if FDConn[i].Connected then
+        FDQuery[i].Active:=True;
 
       DataSource[i]:=TDataSource.Create(self);
       DataSource[i].DataSet:=FDQuery[i];
@@ -178,6 +185,7 @@ begin
 
       TestError[i]:=0;
     except
+
     end;
 
     Inc(i);
@@ -187,6 +195,7 @@ begin
   FormResize(Sender);
   IniFile.Free;
   TimerCheck.Enabled:=true;
+
 end;
 
 procedure TFMain.FormResize(Sender: TObject);
@@ -198,10 +207,11 @@ begin
 
   for i := 0 to Length(DBGrid)-1 do
     begin
-      for x := 0 to 6 do
-        begin
-        DBGrid[i].Columns[x].Width:=(FMain.Width div 7)-10;
-        end;
+        if FDConn[i].Connected then
+          for x := 0 to 6 do
+            begin
+              DBGrid[i].Columns[x].Width:=(FMain.Width div 7)-10;
+           end;
     end;
 
 
@@ -275,6 +285,8 @@ begin
   msg:='';
   for i := 0 to Length(DBGrid)-1 do
     begin
+      if FDConn[i].Connected then
+      begin
       DBGrid[i].DataSource.DataSet.Refresh;
       if DBGrid[i].DataSource.DataSet.RecordCount>0 then
         begin
@@ -289,7 +301,7 @@ begin
         begin
           TestError[i]:=0;
         end;
-
+      end;
     end;
 
     if msg<>'' then

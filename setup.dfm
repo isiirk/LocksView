@@ -195,16 +195,12 @@ object FSetup: TFSetup
     Align = alClient
     BevelOuter = bvNone
     TabOrder = 0
-    ExplicitLeft = 264
-    ExplicitTop = 64
-    ExplicitWidth = 185
-    ExplicitHeight = 41
     object PageControl1: TPageControl
       Left = 0
       Top = 0
       Width = 645
       Height = 268
-      ActivePage = TabSheet1
+      ActivePage = TabSheet2
       Align = alClient
       TabOrder = 0
       object TabSheet1: TTabSheet
@@ -263,14 +259,19 @@ object FSetup: TFSetup
           Align = alClient
           ColCount = 3
           FixedCols = 0
-          Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goEditing, goRowSelect]
+          Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goEditing]
           TabOrder = 0
           OnKeyUp = ServerListKeyUp
-          ExplicitHeight = 201
           ColWidths = (
             141
             208
             218)
+          RowHeights = (
+            24
+            24
+            24
+            24
+            24)
         end
         object Panel3: TPanel
           Left = 0
@@ -280,7 +281,7 @@ object FSetup: TFSetup
           Align = alBottom
           TabOrder = 1
           object Button4: TButton
-            Left = 35
+            Left = 29
             Top = 4
             Width = 24
             Height = 25
@@ -288,17 +289,17 @@ object FSetup: TFSetup
             TabOrder = 0
             OnClick = Button4Click
           end
+          object Button3: TButton
+            Left = 1
+            Top = 4
+            Width = 25
+            Height = 25
+            Caption = '+'
+            TabOrder = 1
+            OnClick = Button3Click
+          end
         end
       end
-    end
-    object Button3: TButton
-      Left = 8
-      Top = 235
-      Width = 25
-      Height = 25
-      Caption = '+'
-      TabOrder = 1
-      OnClick = Button3Click
     end
   end
   object Panel2: TPanel
@@ -309,9 +310,6 @@ object FSetup: TFSetup
     Align = alBottom
     BevelOuter = bvNone
     TabOrder = 1
-    ExplicitLeft = 312
-    ExplicitTop = 240
-    ExplicitWidth = 185
     object Button1: TButton
       Left = 479
       Top = 6

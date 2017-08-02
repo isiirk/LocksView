@@ -23,8 +23,8 @@ type
     EShowCountError: TSpinEdit;
     ServerList: TStringGrid;
     Panel3: TPanel;
-    Button3: TButton;
     Button4: TButton;
+    Button3: TButton;
     procedure Button2Click(Sender: TObject);
     procedure Button1Click(Sender: TObject);
     procedure FormShow(Sender: TObject);
